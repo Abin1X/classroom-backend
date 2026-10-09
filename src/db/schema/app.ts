@@ -32,5 +32,5 @@ export const subjectRelations = relations(subjects,({one,many})=>({
 export type Departments =typeof departments.$inferSelect;
 export type NewDepartments =typeof departments.$inferInsert;
 
-export type Subject =typeof departments.$inferSelect;
-export type NewSubject =typeof departments.$inferInsert;
+export type Subject =typeof subjects.$inferSelect;
+export type NewSubject =typeof subjects.$inferInsert;
