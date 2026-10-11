@@ -8,4 +8,4 @@ if (!databaseUrl || /\[(user|password|neon_hostname|dbname)\]/.test(databaseUrl)
 }
 
 const sql = neon(databaseUrl);
-export const index = drizzle(sql);
+export const db = drizzle(sql);
