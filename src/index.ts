@@ -1,36 +1,23 @@
-import { randomUUID } from "node:crypto";
-import { eq } from "drizzle-orm";
-import { index } from "./db/index.js";
-import { demoUsers } from "./db/schema/index.js";
+import express from "express";
+import cors from "cors";
+import subjectsRouter from "./routes/subjects.js";
+const app = express();
+const port = 8000;
 
-async function main() {
-  console.log("Performing CRUD operations...");
-  const [newUser] = await index.insert(demoUsers).values({
-    name: "Admin User",
-    email: `admin-${randomUUID()}@example.com`,
-  }).returning();
-  if (!newUser) throw new Error("Failed to create user");
-  console.log("CREATE: New user created:", newUser);
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  methods: ["GET","POST","PUT","DELETE"],
+  credentials: true
+}))
 
-  const [foundUser] = await index.select().from(demoUsers)
-    .where(eq(demoUsers.id, newUser.id));
-  if (!foundUser) throw new Error("Failed to read user");
-  console.log("READ: Found user:", foundUser);
+app.use(express.json());
 
-  const [updatedUser] = await index.update(demoUsers)
-    .set({ name: "Super Admin" })
-    .where(eq(demoUsers.id, newUser.id)).returning();
-  if (!updatedUser) throw new Error("Failed to update user");
-  console.log("UPDATE: User updated:", updatedUser);
+app.use("/api/subjects", subjectsRouter);
 
-  const [deletedUser] = await index.delete(demoUsers)
-    .where(eq(demoUsers.id, newUser.id)).returning();
-  if (!deletedUser) throw new Error("Failed to delete user");
-  console.log("DELETE: User deleted.");
-  console.log("CRUD operations completed successfully.");
-}
+app.get("/", (_req, res) => {
+  res.send("Hello from Classroom!");
+});
 
-main().catch(() => {
-  console.error("CRUD failed. Check DATABASE_URL, database access, and migrations.");
-  process.exitCode = 1;
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });
